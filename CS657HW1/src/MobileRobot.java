@@ -10,6 +10,7 @@ public class MobileRobot {
         String[][] map = new String[30][30];
         initMap(map, 20);
         printMap(map);
+        System.out.println("No path.");
     }
     public static void initMap(String map[][], int blockPercent) {
         int mapLength = map.length * map[0].length;
@@ -27,25 +28,23 @@ public class MobileRobot {
             int blockY = randy.nextInt(map[0].length);
             map[blockX][blockY] = "x ";
         }
-        map[5][5] = "O ";
-        map[29][29] = "E ";
-    }
-
-    public static void initRobotMap(String map[][]) {
-
     }
 
     public static void printMap(String map[][]) throws Exception {
         //init robot map
         String[][] robotMap = new String[30][30];
+        String[][] robotPath = new String[30][30];
+        //init step counter
+        int counter = 0;
+
         for(int i = 0; i < robotMap.length; i++) {
             for(int j = 0; j < robotMap[i].length; j++) {
                 robotMap[i][j] = "_ ";
+                robotPath[i][j] = "_ ";
             }
         }
 
         Console c = System.console();
-        c.readLine();
         if (c == null) {
             System.err.println("no console");
             System.exit(1);
@@ -54,58 +53,127 @@ public class MobileRobot {
         // clear screen only the first time
         c.writer().print(ESC + "[2J");
         c.flush();
-        Thread.sleep(200);
+
         //int position x, y
         int x = 5;
         int y = 5;
+        int nextX = 5;
+        int nextY = 5;
         //init angle
         float robotAngle = 45;
         //init path
         LinkedList<Vertex> path = new LinkedList<Vertex>();
         ListIterator<Vertex> listIterator = path.listIterator();
+
+        // See more after moving.
+        robotSensor(x, y, robotAngle-45, robotMap, robotPath, map);
+        robotSensor(x, y, robotAngle, robotMap, robotPath, map);
+        robotSensor(x, y, robotAngle+45, robotMap, robotPath, map);
+
         while(true) {
+            // clear screen only the first time
+            c.writer().print(ESC + "[2J");
+            c.flush();
+
             // reposition the cursor to 1|1
             c.writer().print(ESC + "[1;1H");
             c.flush();
 
+            //robot move
+            robotPath[x][y] = "O ";
+
             for(int i = 0; i < map.length; i++) {
                 for(int j = 0; j < map[i].length; j++) {
-                    c.writer().print(map[i][j]);
+                    if (i == x && j == y) {
+                        c.writer().print("O ");
+                    } else {
+                        c.writer().print(map[i][j]);
+                    }
                 }
                 c.writer().println();
             }
             c.writer().println();
             for(int i = 0; i < robotMap.length; i++) {
                 for(int j = 0; j < robotMap[i].length; j++) {
-                    c.writer().print(robotMap[i][j]);
+                    if (robotPath[i][j].equals("O ") || robotPath[i][j].equals("E ")) {
+                        c.writer().print(robotPath[i][j]);
+                    } else {
+                        c.writer().print(robotMap[i][j]);
+                    }
                 }
                 c.writer().println();
             }
-            c.flush();
-            map[x][y] = "_ ";
-            //robot move
-            robotSensor(x, y, robotAngle-45, robotMap, map);
-            robotSensor(x, y, robotAngle, robotMap, map);
-            robotSensor(x, y, robotAngle+45, robotMap, map);
+            c.writer().println("robot angle: " + robotAngle);
+            c.writer().println("robot x: " + x);
+            c.writer().println("robot y: " + y);
+
+
             if(path.isEmpty())
             {
                 path = getPath(robotMap, x, y, 29, 29);
-                listIterator = path.listIterator();
+                if (path != null) {
+                    listIterator = path.listIterator();
+                    listIterator.next();
+                } else {
+                    System.out.println("No path.");
+                    return;
+                }
             }
             if(listIterator.hasNext()) {
                 Vertex v = listIterator.next();
-                robotAngle = getAngle(x, y, v.getI(), v.getJ());
-                x = v.getI();
-                y = v.getJ();
+                nextX = v.getI();
+                nextY = v.getJ();
             }
-            if(map[x][y].equals("x ")) {
+
+            // Turn to that direction.
+
+            float tempAngle = robotAngle;
+            robotAngle = getAngle(x, y, nextX, nextY);
+            counter = counter + (int)Math.abs(tempAngle - robotAngle)/45;
+
+            // See more in that direction.
+            robotSensor(x, y, robotAngle-45, robotMap, robotPath, map);
+            robotSensor(x, y, robotAngle, robotMap, robotPath, map);
+            robotSensor(x, y, robotAngle+45, robotMap, robotPath, map);
+
+            if(robotMap[nextX][nextY].equals("x ")) {
                 path = getPath(robotMap, x, y, 29, 29);
-                listIterator = path.listIterator();
+                if (path != null) {
+                    listIterator = path.listIterator();
+                    listIterator.next();
+
+                    for(Vertex v : path) {
+                        c.writer().print("<" + v.getI() + "," + v.getJ() + ">,");
+                    }
+                    c.writer().println();
+
+                } else {
+                    System.out.println("No path.");
+                    return;
+                }
             }
             else{
-                map[x][y] = "O ";
+                // Move.
+                if(x != nextX || y != nextY) {
+                    counter = counter + 1;
+                }
+
+                x = nextX;
+                y = nextY;
+
+                // See more after moving.
+                robotSensor(x, y, robotAngle-45, robotMap, robotPath, map);
+                robotSensor(x, y, robotAngle, robotMap, robotPath, map);
+                robotSensor(x, y, robotAngle+45, robotMap, robotPath, map);
+
+                c.writer().println("robot next x: " + x);
+                c.writer().println("robot next y: " + y);
+                c.writer().println("path size: " + path.size());
+                c.writer().println("current steps: " + counter);
             }
-            Thread.sleep(800);
+
+            c.flush();
+            c.readLine();
         }
     }
 
@@ -140,14 +208,14 @@ public class MobileRobot {
         }
         for(int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
-                addLane(i, j,i-1, j, nodes, edges);
-                addLane(i, j,i-1, j+1, nodes, edges);
-                addLane(i, j,i,j+1, nodes, edges);
-                addLane(i, j, i+1, j+1, nodes, edges);
-                addLane(i, j,i+1, j, nodes, edges);
-                addLane(i, j, i+1, j-1, nodes, edges);
-                addLane(i, j, i, j-1, nodes, edges);
                 addLane(i, j, i-1, j-1, nodes, edges);
+                addLane(i, j, i-1, j,   nodes, edges);
+                addLane(i, j, i-1, j+1, nodes, edges);
+                addLane(i, j, i,   j-1, nodes, edges);
+                addLane(i, j, i,   j+1, nodes, edges);
+                addLane(i, j, i+1, j-1, nodes, edges);
+                addLane(i, j, i+1, j,   nodes, edges);
+                addLane(i, j, i+1, j+1, nodes, edges);
             }
         }
 
@@ -194,9 +262,10 @@ public class MobileRobot {
         }
     }
     //robot sensor
-    public static void robotSensor(int x, int y, float angle, String robotMap[][], String map[][]) {
+    public static void robotSensor(int x, int y, float angle, String robotMap[][], String robotPath[][], String map[][]) {
         String s = map[x][y];
         while(s.equals("_ ")) {
+            robotPath[x][y] = "E ";
             x = x + getSinSign(angle);
             y = y + getCosSign(angle);
             if(x>29 || x<0 || y>29 || y<0){
