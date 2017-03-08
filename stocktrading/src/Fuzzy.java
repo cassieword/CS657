@@ -4,13 +4,12 @@
 public class Fuzzy {
 
     public static void main(String[] args) {
-        float price;
+        float price = 0;
         float mad;
-        float money;
         float stock = 0;
         float totalMoney = 10000;
         float r = randomWithRange(-1, 1);
-        for(int i = 0; i < 150; i++) {
+        for(int i = 1; i < 151; i++) {
             price = getPrice(i,r);
             mad = getMAD(i,r);
             float priceArray[] = fuzzyPrice(price);
@@ -18,20 +17,19 @@ public class Fuzzy {
             float ruleBase[][] = ruleBase(priceArray, madArray);
             float cog = cogOutput(ruleBase);
             //cog negtive sell, cog positive buy
-//            if(cog < 0 && stock < Math.abs(stock)) {
-//                cog = -stock;
-//            }
-            money = calculate(cog,price);
-            totalMoney = totalMoney - money;
-//            stock = stock + cog;
-            if(totalMoney < 0){
-                System.out.println("Your money is not enough! Please wait to next trade.");
-                totalMoney = totalMoney + money;
-//                stock = stock - cog;
-                i++;
+            //if buy consider money, if sell consider stock.
+            if (cog > 0 && totalMoney < cog) {
+                cog = totalMoney;
             }
+            else if (cog < 0 && - cog > stock * price) {
+                cog = - stock * price;
+            }
+            totalMoney = totalMoney - cog;
+            stock = stock + cog / price;
             System.out.println("For the " + i +"th day, the money you have is " + totalMoney + ", the stocks you have is "+ stock);
         }
+        System.out.println("the money you have is " + (totalMoney + stock * price));
+
     }
     private static float getPrice(int i, float r) {
         float p = (float)(10 + 2.5 * Math.sin(Math.PI*2*i/19) + 0.8 * Math.cos(Math.PI*2*i/5) + 7 * r * (i%2));
@@ -121,13 +119,5 @@ public class Fuzzy {
     private static float Max(float x, float y, float z) {
         float max = Math.max(Math.max(x,y),z);
         return max;
-    }
-    private static float calculate(float cog, float p) {
-        float m;
-        m = cog * p;
-        if(m < -800) m = -800;//sell
-        else if(m > 800) m = 800;//buy
-        else m = m;
-        return m;
     }
 }
