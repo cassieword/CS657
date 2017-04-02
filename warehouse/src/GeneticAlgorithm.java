@@ -77,11 +77,11 @@ public class GeneticAlgorithm {
     }
 
     public static void GA(int[][] array) {
-        double probability = Math.random();
         Integer[] selectNumber;
         int n = chromosomeNum;
-       // while(n < chromosomeNum*2) {
-            if (probability < 0.01) {
+        while(n < chromosomeNum*2) {
+            probability = Math.random();
+            if (probability > 0.1) {
                 System.out.println("Use crossover method: ");
                 // array used to crossover
                 selectNumber = randomSelect(2, chromosomeNum);
@@ -102,34 +102,51 @@ public class GeneticAlgorithm {
 
                 for(int i = 0; i < 30; i++) {
                     array[n][i] = newChromosome[0][i];
-                    if(n+2 > chromosomeNum * 2) {
-                        break;
+                    if(n+1 == chromosomeNum * 2) {
+                        continue;
                     } else {
                         array[n+1][i] = newChromosome[1][i];
                     }
                 }
                 n = n+2;
+                if(n > chromosomeNum * 2) {
+                    n = chromosomeNum * 2;
+                }
+                System.out.println();
             }
             else {
                 System.out.println("Use mutation method: ");
                 // use mutation
+                // select mutation chromosome
                 int number = ThreadLocalRandom.current().nextInt(0, chromosomeNum);
                 System.out.println(number);
                 int[] mutationArr = new int[array[0].length];
                 for(int i = 0; i < array[0].length; i++) {
                     mutationArr[i] = array[number][i];
-                    System.out.print(mutationArr[i]+" ");
                 }
+                // select mutation position
+                selectNumber = randomSelect(2, 30);
+                // mutation
+                int temp = mutationArr[selectNumber[0]];
+                mutationArr[selectNumber[0]] = mutationArr[selectNumber[1]];
+                mutationArr[selectNumber[1]] = temp;
+                // add to original chromosome array
+                for(int i = 0; i < 30; i++) {
+                    array[n][i] = mutationArr[i];
+                }
+                n = n + 1;
             }
-        //}
+        }
 
-        /*System.out.println("Current generation chromosomes sequences: ");
+        System.out.println("Current generation chromosomes sequences: ");
         for(int i = 0; i < array.length; i++) {
+            System.out.print(i + " ");
             for(int j = 0; j < array[0].length; j++) {
                 System.out.print(array[i][j]+ " ");
             }
             System.out.println();
-        }*/
+        }
+        calculateFitness(array);
 
     }
 
@@ -147,7 +164,7 @@ public class GeneticAlgorithm {
     }
     //step 3-1: calculate fitness of the chromosomes
     public static void calculateFitness(int[][] chromosomeArray) {
-        int[] fitness  = new int[chromosomeNum];
+        int[] fitness  = new int[chromosomeNum*2];
         int distance;
         int backtowarehouse;
         for(int i = 0; i < chromosomeArray.length; i++) {
@@ -166,75 +183,65 @@ public class GeneticAlgorithm {
             int pointxEnd = chromosomeArray[i][chromosomeArray[0].length-1] % 30;
             int pointyEnd = chromosomeArray[i][chromosomeArray[0].length-1] / 30;
             backtowarehouse = (int)Math.sqrt(Math.pow((pointxEnd - 5),2) + Math.pow((pointyEnd - 5),2));
-            fitness[i] = fitness[i] + backtowarehouse;
+            fitness[i] = 1000000/(fitness[i] + backtowarehouse);
             // initial fitness
             System.out.print(fitness[i] + " ");
         }
-        // array used to crossover
         System.out.println();
         System.out.println("selected fitness number: ");
-        int[] arrNum = randomSelectChromosome(fitness, 2);
-        int[] crossoverArrOne = new int[chromosomeArray[0].length];
-        int[] crossoverArrTwo = new int[chromosomeArray[1].length];
-        for(int i = 0; i<2; i++) {
+        randomSelectChromosome(fitness, chromosomeNum, chromosomeArray);
+
+        /*for(int i = 0; i<chromosomeNum; i++) {
             System.out.print(arrNum[i] + " ");
-        }
-        System.out.println();
-        for(int i = 0; i < chromosomeArray[0].length; i++) {
-            //System.out.print(arrNum[i] + " ");
-            crossoverArrOne[i] = chromosomeArray[arrNum[0]][i];
-            System.out.print(crossoverArrOne[i] + " ");
-        }
-        System.out.println();
-        for(int i = 0; i < chromosomeArray[0].length; i++) {
-            //System.out.print(arrNum[i] + " ");
-            crossoverArrTwo[i] = chromosomeArray[arrNum[1]][i];
-            System.out.print(crossoverArrTwo[i] + " ");
-        }
-        //crossoverMethod(crossoverArrOne, crossoverArrTwo);
+        }*/
 
     }
     //step 3-2: base on probability, randomly select # chromosomes
-    public static int[] randomSelectChromosome(int[] array, int selectNum) {
+    public static void randomSelectChromosome(int[] fitnessArray, int selectNum, int[][] previousGeneration) {
         int total = 0;
-        int[] totalArray = new int[array.length];
-        Set<Integer> selectedSet = new HashSet<>();
-        //Random rand = new Random();
-        int[] tempArray = new int[selectNum];
-        int[] selectedArray = new int[selectNum];
-        for(int i = 0; i < array.length; i++) {
-            total = total + array[i];
-            totalArray[i] = total;
+        int[] totalArray = new int[fitnessArray.length+1];
+        int[][] nextGeneration = new int[selectNum][30];
+        totalArray[0] = 0;
+        Set<Integer> set = new HashSet<>();
+        for(int i = 0; i < fitnessArray.length; i++) {
+            total = total + fitnessArray[i];
+            totalArray[i+1] = total;
         }
-        for(int i = 0; i < selectNum; i++) {
-            int select = (int)(Math.random() * total);
-            while(selectedSet.contains(select)) {
-                select = (int)(Math.random() * total);
-            }
-            selectedSet.add(select);
-        }
-        Integer[] arr = selectedSet.toArray(new Integer[selectedSet.size()]);
-        /*for(int j = 0; j < totalArray.length; j++) {
+        for(int j = 0; j < totalArray.length; j++) {
             System.out.print(totalArray[j] + " ");
         }
-        System.out.println();*/
-        for(int i = 0; i < selectNum; i++) {
-            //System.out.println(arr[i]);
-            for(int j = 0; j < totalArray.length; j++) {
-                if(arr[i] < totalArray[j]) {
-                    tempArray[i] = j;
-                    break;
-                } else {
-                   j++;
+        System.out.println();
+
+        for(int i = 0; i < selectNum;) {
+            int select = (int)(Math.random() * total);
+            for(int j = 1; j < totalArray.length; j++) {
+                if(select < totalArray[j] && select > totalArray[j-1] && !set.contains(j-1) ) {
+                    set.add(j-1);
+                    i++;
                 }
             }
         }
-        for(int i = 0; i < selectNum; i++) {
-            int num = tempArray[i];
-            selectedArray[i] = num;
-            //System.out.println(tempArray[i] + ": " +totalArray[num]+" "+ array[num]);
+        Integer[] arr = set.toArray(new Integer[set.size()]);
+        for(int i=0; i<selectNum; i++) {
+            System.out.print(arr[i]+" ");
         }
-        return selectedArray;
+        System.out.println();
+        for(int i = 0; i < selectNum; i++) {
+            //int num = arr[i];
+            //selectedArray[i] = num;
+            System.out.println(arr[i] + ": " +totalArray[arr[i]]+" "+ fitnessArray[arr[i]]);
+        }
+        //Generate next generation
+        System.out.println("Next generation is: ");
+        for(int i = 0; i < arr.length; i++) {
+            for(int j = 0; j < 30; j++) {
+                nextGeneration[i][j] = previousGeneration[arr[i]][j];
+                System.out.print(nextGeneration[i][j] + " ");
+            }
+            System.out.println();
+        }
+
+        //return selectedArray;
     }
 
     //random select #
