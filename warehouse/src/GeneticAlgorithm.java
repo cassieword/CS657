@@ -10,10 +10,14 @@ import java.util.concurrent.ThreadLocalRandom;
 public class GeneticAlgorithm {
     public static Set<Integer> set = new HashSet<Integer>();
     public static int chromosomeNum;
+    public static double probability;
+    public static int[][] initialChromosomes;
     public static void main(String[] args) {
         String[][] map = new String[30][30];
         initHouse(map);
-        generateChromosomes(set);
+        initialChromosomes = generateChromosomes(set);
+        GA(initialChromosomes);
+
     }
     // step 1: Generate Let n=30 random home locations in the above rectangular area.
     public static void initHouse(String map[][]) {
@@ -43,7 +47,7 @@ public class GeneticAlgorithm {
         }
     }
     //step 2: Generate the sequence of home deliveries, i.e. AH0H1...HnA
-    public static void generateChromosomes(Set<Integer> set) {
+    public static int[][] generateChromosomes(Set<Integer> set) {
         //step 3: Randomly generate C (= 8 to 12, your choice) initial chromosomes.
         chromosomeNum = ThreadLocalRandom.current().nextInt(8, 12 + 1);
         System.out.println();
@@ -54,7 +58,7 @@ public class GeneticAlgorithm {
         System.out.println(chromosomeNum+" chromosome sequences:");
         System.out.println();
         set.remove(25);
-        int[][] chromosomeArray = new int[chromosomeNum][30];
+        int[][] chromosomeArray = new int[chromosomeNum * 2][30];
         for(int i = 0; i < chromosomeNum; i++) {
             Integer[] arr = set.toArray(new Integer[set.size()]);
             shuffleArray(arr);
@@ -64,9 +68,69 @@ public class GeneticAlgorithm {
             }
             System.out.println();
         }
-        System.out.println();
-        System.out.println("Fitness Array: ");
-        calculateFitness(chromosomeArray);
+        return chromosomeArray;
+
+
+        //System.out.println();
+        //System.out.println("Fitness Array: ");
+        //calculateFitness(chromosomeArray);
+    }
+
+    public static void GA(int[][] array) {
+        double probability = Math.random();
+        Integer[] selectNumber;
+        int n = chromosomeNum;
+       // while(n < chromosomeNum*2) {
+            if (probability < 0.01) {
+                System.out.println("Use crossover method: ");
+                // array used to crossover
+                selectNumber = randomSelect(2, chromosomeNum);
+                int[] crossoverArrOne = new int[array[0].length];
+                int[] crossoverArrTwo = new int[array[0].length];
+                for(int i = 0; i<2; i++) {
+                    System.out.print(selectNumber[i] + " ");
+                }
+                //Original two crossover arrays
+                for(int i = 0; i < array[0].length; i++) {
+                    crossoverArrOne[i] = array[selectNumber[0]][i];
+                }
+                for(int i = 0; i < array[0].length; i++) {
+                    crossoverArrTwo[i] = array[selectNumber[1]][i];
+                }
+                //Generate new crossover array
+                int[][] newChromosome = crossoverMethod(crossoverArrOne, crossoverArrTwo);
+
+                for(int i = 0; i < 30; i++) {
+                    array[n][i] = newChromosome[0][i];
+                    if(n+2 > chromosomeNum * 2) {
+                        break;
+                    } else {
+                        array[n+1][i] = newChromosome[1][i];
+                    }
+                }
+                n = n+2;
+            }
+            else {
+                System.out.println("Use mutation method: ");
+                // use mutation
+                int number = ThreadLocalRandom.current().nextInt(0, chromosomeNum);
+                System.out.println(number);
+                int[] mutationArr = new int[array[0].length];
+                for(int i = 0; i < array[0].length; i++) {
+                    mutationArr[i] = array[number][i];
+                    System.out.print(mutationArr[i]+" ");
+                }
+            }
+        //}
+
+        /*System.out.println("Current generation chromosomes sequences: ");
+        for(int i = 0; i < array.length; i++) {
+            for(int j = 0; j < array[0].length; j++) {
+                System.out.print(array[i][j]+ " ");
+            }
+            System.out.println();
+        }*/
+
     }
 
     private static void shuffleArray(Integer[] array)
@@ -127,7 +191,7 @@ public class GeneticAlgorithm {
             crossoverArrTwo[i] = chromosomeArray[arrNum[1]][i];
             System.out.print(crossoverArrTwo[i] + " ");
         }
-        crossoverMethod(crossoverArrOne, crossoverArrTwo);
+        //crossoverMethod(crossoverArrOne, crossoverArrTwo);
 
     }
     //step 3-2: base on probability, randomly select # chromosomes
@@ -189,16 +253,12 @@ public class GeneticAlgorithm {
         return array;
     }
 
-    public static void crossoverMethod(int[] arr1, int[] arr2) {
+    public static int[][] crossoverMethod(int[] arr1, int[] arr2) {
+        int[][] newChromosome = new int[2][30];
         int crossoverNum = ThreadLocalRandom.current().nextInt(3, 15);
         Integer[] crossoverLocation = randomSelect(crossoverNum, 30);
+        //The first crossover select position:
         Arrays.sort(crossoverLocation);
-        System.out.println();
-        System.out.println("The first crossover select position: ");
-        for(int i = 0; i<crossoverNum; i++) {
-            System.out.print(crossoverLocation[i] + " ");
-        }
-        System.out.println();
         int[] firstCrossLocation = new int[crossoverNum];
         int[] firstCrossContent = new int[crossoverNum];
         int[] secondCrossLocaion = new int[crossoverNum];
@@ -206,8 +266,8 @@ public class GeneticAlgorithm {
         for(int i = 0; i < crossoverNum; i++) {
             firstCrossLocation[i] = crossoverLocation[i];
             firstCrossContent[i] = arr1[crossoverLocation[i]];
-            System.out.print(firstCrossContent[i] + " ");
         }
+        //The second crossover select position:
         for(int i = 0; i < crossoverNum; i++) {
             for(int j = 0; j < arr1.length; j++) {
                 if(firstCrossContent[i] == arr2[j]) {
@@ -215,15 +275,6 @@ public class GeneticAlgorithm {
                     secondCrossContent[i] = firstCrossContent[i];
                 }
             }
-        }
-        System.out.println();
-        System.out.println("The second crossover position: ");
-        for(int i = 0; i < crossoverNum; i++) {
-            System.out.print(secondCrossLocaion[i] + " ");
-        }
-        System.out.println();
-        for(int i = 0; i < crossoverNum; i++) {
-            System.out.print(secondCrossContent[i] + " ");
         }
         // Sort secondCross
         boolean swapped = true;
@@ -245,54 +296,22 @@ public class GeneticAlgorithm {
                 }
             }
         }
-        System.out.println();
-        System.out.println("The sort second crossover position: ");
-        for(int i = 0; i < crossoverNum; i++) {
-            System.out.print(secondCrossLocaion[i] + " ");
-        }
-        System.out.println();
-        for(int i = 0; i < crossoverNum; i++) {
-            System.out.print(secondCrossContent[i] + " ");
-        }
+        //Crossover
         int tempCrossContent;
         for(int i = 0; i < crossoverNum; i++) {
             tempCrossContent = secondCrossContent[i];
             secondCrossContent[i] = firstCrossContent[i];
             firstCrossContent[i] = tempCrossContent;
         }
-        System.out.println();
-        System.out.println("The new first crossover position: ");
         for(int i = 0; i < crossoverNum; i++) {
-            System.out.print(firstCrossLocation[i] + " ");
+            arr1[firstCrossLocation[i]] = firstCrossContent[i];
+            arr2[secondCrossLocaion[i]] = secondCrossContent[i];
         }
-        System.out.println();
-        for(int i = 0; i < crossoverNum; i++) {
-            System.out.print(firstCrossContent[i] + " ");
+        //Generate new chromosomes
+        for(int i = 0; i < 30; i++) {
+            newChromosome[0][i] = arr1[i];
+            newChromosome[1][i] = arr2[i];
         }
-        System.out.println();
-        System.out.println("The new second crossover position: ");
-        for(int i = 0; i < crossoverNum; i++) {
-            System.out.print(secondCrossLocaion[i] + " ");
-        }
-        System.out.println();
-        for(int i = 0; i < crossoverNum; i++) {
-            System.out.print(secondCrossContent[i] + " ");
-        }
-        for(int i = 0; i < crossoverNum; i++) {
-            arr1[firstCrossLocation[i]] = secondCrossContent[i];
-            arr2[secondCrossLocaion[i]] = firstCrossContent[i];
-        }
-        System.out.println();
-        System.out.println("new array one: ");
-        for(int i = 0; i < arr1.length; i++) {
-            //crossoverArrOne[i] = chromosomeArray[arrNum[0]][i];
-            System.out.print(arr1[i] + " ");
-        }
-        System.out.println();
-        System.out.println("new array two: ");
-        for(int i = 0; i < arr2.length; i++) {
-            //crossoverArrTwo[i] = chromosomeArray[arrNum[1]][i];
-            System.out.print(arr2[i] + " ");
-        }
+        return newChromosome;
     }
 }
