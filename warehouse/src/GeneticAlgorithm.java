@@ -63,6 +63,8 @@ public class GeneticAlgorithm {
             }
             System.out.println();
         }
+        System.out.println();
+        System.out.println("Fitness Array: ");
         calculateFitness(chromosomeArray);
     }
 
@@ -78,29 +80,146 @@ public class GeneticAlgorithm {
             array[i] = temp;
         }
     }
-
+    //step 3-1: calculate fitness of the chromosomes
     public static void calculateFitness(int[][] chromosomeArray) {
-        double[] fitness  = new double[chromosomeNum];
-        double distance = 0;
-        double backtowarehouse = 0;
+        int[] fitness  = new int[chromosomeNum];
+        int distance;
+        int backtowarehouse;
         for(int i = 0; i < chromosomeArray.length; i++) {
             for(int j = 0; j < chromosomeArray[0].length; j++) {
                 int pointx = chromosomeArray[i][j] % 30;
                 int pointy = chromosomeArray[i][j] / 30;
                 if(j==0) {
-                    distance = Math.sqrt(Math.pow((pointx - 5),2) + Math.pow((pointy - 5),2));
+                    distance = (int)Math.sqrt(Math.pow((pointx - 5),2) + Math.pow((pointy - 5),2));
                 } else {
                     int pointxPre = chromosomeArray[i][j-1] % 30;
                     int pointyPre = chromosomeArray[i][j-1] / 30;
-                    distance = Math.sqrt(Math.pow((pointx - pointxPre),2) + Math.pow((pointy - pointyPre),2));
+                    distance = (int)Math.sqrt(Math.pow((pointx - pointxPre),2) + Math.pow((pointy - pointyPre),2));
                 }
                 fitness[i] = fitness[i] + distance;
             }
             int pointxEnd = chromosomeArray[i][chromosomeArray[0].length-1] % 30;
             int pointyEnd = chromosomeArray[i][chromosomeArray[0].length-1] / 30;
-            backtowarehouse = Math.sqrt(Math.pow((pointxEnd - 5),2) + Math.pow((pointyEnd - 5),2));
+            backtowarehouse = (int)Math.sqrt(Math.pow((pointxEnd - 5),2) + Math.pow((pointyEnd - 5),2));
             fitness[i] = fitness[i] + backtowarehouse;
-            System.out.println(fitness[i]);
+            // initial fitness
+            System.out.print(fitness[i] + " ");
         }
+        // array used to crossover
+        System.out.println();
+        System.out.println("selected fitness number: ");
+        int[] arrNum = randomSelectChromosome(fitness, 2);
+        int[] crossoverArrOne = new int[chromosomeArray[0].length];
+        int[] crossoverArrTwo = new int[chromosomeArray[1].length];
+        for(int i = 0; i<2; i++) {
+            System.out.print(arrNum[i] + " ");
+        }
+        System.out.println();
+        for(int i = 0; i < chromosomeArray[0].length; i++) {
+            //System.out.print(arrNum[i] + " ");
+            crossoverArrOne[i] = chromosomeArray[arrNum[0]][i];
+            System.out.print(crossoverArrOne[i] + " ");
+        }
+        System.out.println();
+        for(int i = 0; i < chromosomeArray[0].length; i++) {
+            //System.out.print(arrNum[i] + " ");
+            crossoverArrTwo[i] = chromosomeArray[arrNum[1]][i];
+            System.out.print(crossoverArrTwo[i] + " ");
+        }
+        int crossoverNum = ThreadLocalRandom.current().nextInt(1, 15);
+        Integer[] crossoverLocation = randomSelect(crossoverNum, 30);
+        System.out.println();
+        System.out.println("crossover select position: ");
+        for(int i = 0; i<crossoverNum; i++) {
+            System.out.print(crossoverLocation[i] + " ");
+        }
+        System.out.println();
+        int[] firstCrossLocation = new int[crossoverNum];
+        int[] firstCrossContent = new int[crossoverNum];
+        int[] secondCrossLocaion = new int[crossoverNum];
+        int[] secondCrossContent = new int[crossoverNum];
+        for(int i = 0; i < crossoverNum; i++) {
+            firstCrossLocation[i] = crossoverLocation[i];
+            firstCrossContent[i] = crossoverArrOne[crossoverLocation[i]];
+            System.out.print(firstCrossContent[i] + " ");
+        }
+        // Stuck Here!
+        for(int i = 0; i < crossoverNum; i++) {
+            for(int j = 0; j < chromosomeArray[0].length; j++) {
+                if(firstCrossContent[i] == crossoverArrTwo[j]) {
+                    secondCrossLocaion[i] = j;
+                    secondCrossContent[i] = firstCrossContent[i];
+                }
+            }
+        }
+
+        System.out.println();
+        System.out.println("The second crossover position: ");
+        for(int i = 0; i < crossoverNum; i++) {
+            System.out.print(secondCrossLocaion[i] + " ");
+        }
+        System.out.println();
+        for(int i = 0; i < crossoverNum; i++) {
+            System.out.print(secondCrossContent[i] + " ");
+        }
+
+    }
+    //step 3-2: base on probability, randomly select # chromosomes
+    public static int[] randomSelectChromosome(int[] array, int selectNum) {
+        int total = 0;
+        int[] totalArray = new int[array.length];
+        Set<Integer> selectedSet = new HashSet<>();
+        //Random rand = new Random();
+        int[] tempArray = new int[selectNum];
+        int[] selectedArray = new int[selectNum];
+        for(int i = 0; i < array.length; i++) {
+            total = total + array[i];
+            totalArray[i] = total;
+        }
+        for(int i = 0; i < selectNum; i++) {
+            int select = (int)(Math.random() * total);
+            while(selectedSet.contains(select)) {
+                select = (int)(Math.random() * total);
+            }
+            selectedSet.add(select);
+        }
+        Integer[] arr = selectedSet.toArray(new Integer[selectedSet.size()]);
+        /*for(int j = 0; j < totalArray.length; j++) {
+            System.out.print(totalArray[j] + " ");
+        }
+        System.out.println();*/
+        for(int i = 0; i < selectNum; i++) {
+            //System.out.println(arr[i]);
+            for(int j = 0; j < totalArray.length; j++) {
+                if(arr[i] < totalArray[j]) {
+                    tempArray[i] = j;
+                    break;
+                } else {
+                   j++;
+                }
+            }
+        }
+        for(int i = 0; i < selectNum; i++) {
+            int num = tempArray[i];
+            selectedArray[i] = num;
+            //System.out.println(tempArray[i] + ": " +totalArray[num]+" "+ array[num]);
+        }
+        return selectedArray;
+    }
+
+    //random select #
+    public static Integer[] randomSelect(int num, int maximum) {
+        Set<Integer> set = new HashSet<>();
+        int[] arr = new int[num];
+        Random rand = new Random();
+        for(int i = 0; i < num; i++) {
+            int a = rand.nextInt(maximum);
+            while(set.contains(a)) {
+                a = rand.nextInt(maximum);
+            }
+            set.add(a);
+        }
+        Integer[] array = set.toArray(new Integer[set.size()]);
+        return array;
     }
 }
