@@ -11,13 +11,64 @@ public class GeneticAlgorithm {
     public static Set<Integer> set = new HashSet<Integer>();
     public static int chromosomeNum;
     public static double probability;
-    public static int[][] initialChromosomes;
+    //public static int[][] initialChromosomes;
+    public static int[][] gaChromosomes;
+    public static int[][] previousGeneration;
+    public static int[][] nextGeneration;
+    public static int[][] tempGeneration;
     public static void main(String[] args) {
         String[][] map = new String[30][30];
         initHouse(map);
-        initialChromosomes = generateChromosomes(set);
-        GA(initialChromosomes);
+        int loopNum = 0;
+        //initialize the fist generation
+        previousGeneration = generateChromosomes(set);
+        System.out.println("previous generation 1: ");
+        System.out.println();
+        for(int i = 0; i < previousGeneration.length; i++) {
+            for(int j = 0; j < previousGeneration[0].length; j++) {
+                System.out.print(previousGeneration[i][j] + " ");
+            }
+            System.out.println();
+        }
+        //加了这行之后，previous generation 变了， 不想让它变
+        gaChromosomes = GA(previousGeneration);
+        System.out.println("previous generation 2: ");
+        System.out.println();
+        for(int i = 0; i < previousGeneration.length; i++) {
+            for(int j = 0; j < previousGeneration[0].length; j++) {
+                System.out.print(previousGeneration[i][j] + " ");
+            }
+            System.out.println();
+        }
+        /*gaChromosomes = GA(previousGeneration);
+        nextGeneration = getNextGeneration(gaChromosomes);
 
+        System.out.println("previous generation 2: ");
+        System.out.println();
+        for(int i = 0; i < previousGeneration.length; i++) {
+            for(int j = 0; j < previousGeneration[0].length; j++) {
+                System.out.print(previousGeneration[i][j] + " ");
+            }
+            System.out.println();
+        }
+        System.out.println("new generation: ");
+        System.out.println();
+        for(int i = 0; i < nextGeneration.length; i++) {
+            for(int j = 0; j < nextGeneration[0].length; j++) {
+                System.out.print(nextGeneration[i][j] + " ");
+            }
+            System.out.println();
+        }*/
+        // 卡住啦！！！！！！！loop 怎么写啊！！！！！！！
+        /*while( loopNum < 400) {
+            //chromosomes sequence after genetic algorithm:
+            gaChromosomes = GA(previousGeneration);
+            //generate next generation
+            nextGeneration = getNextGeneration(gaChromosomes);
+            previousGeneration = nextGeneration;
+            loopNum++;
+            System.out.println(loopNum + "th Generation");
+        }*/
     }
     // step 1: Generate Let n=30 random home locations in the above rectangular area.
     public static void initHouse(String map[][]) {
@@ -52,13 +103,11 @@ public class GeneticAlgorithm {
         chromosomeNum = ThreadLocalRandom.current().nextInt(8, 12 + 1);
         System.out.println();
         System.out.println("Number of chromosomes:");
-        System.out.println();
         System.out.println(chromosomeNum);
         System.out.println();
         System.out.println(chromosomeNum+" chromosome sequences:");
-        System.out.println();
         set.remove(25);
-        int[][] chromosomeArray = new int[chromosomeNum * 2][30];
+        int[][] chromosomeArray = new int[chromosomeNum*2][30];
         for(int i = 0; i < chromosomeNum; i++) {
             Integer[] arr = set.toArray(new Integer[set.size()]);
             shuffleArray(arr);
@@ -76,7 +125,8 @@ public class GeneticAlgorithm {
         //calculateFitness(chromosomeArray);
     }
 
-    public static void GA(int[][] array) {
+    public static int[][] GA(int[][] array) {
+        int[][] gaArray = array;
         Integer[] selectNumber;
         int n = chromosomeNum;
         while(n < chromosomeNum*2) {
@@ -101,11 +151,11 @@ public class GeneticAlgorithm {
                 int[][] newChromosome = crossoverMethod(crossoverArrOne, crossoverArrTwo);
 
                 for(int i = 0; i < 30; i++) {
-                    array[n][i] = newChromosome[0][i];
+                    gaArray[n][i] = newChromosome[0][i];
                     if(n+1 == chromosomeNum * 2) {
                         continue;
                     } else {
-                        array[n+1][i] = newChromosome[1][i];
+                        gaArray[n+1][i] = newChromosome[1][i];
                     }
                 }
                 n = n+2;
@@ -132,22 +182,12 @@ public class GeneticAlgorithm {
                 mutationArr[selectNumber[1]] = temp;
                 // add to original chromosome array
                 for(int i = 0; i < 30; i++) {
-                    array[n][i] = mutationArr[i];
+                    gaArray[n][i] = mutationArr[i];
                 }
                 n = n + 1;
             }
         }
-
-        System.out.println("Current generation chromosomes sequences: ");
-        for(int i = 0; i < array.length; i++) {
-            System.out.print(i + " ");
-            for(int j = 0; j < array[0].length; j++) {
-                System.out.print(array[i][j]+ " ");
-            }
-            System.out.println();
-        }
-        calculateFitness(array);
-
+        return gaArray;
     }
 
     private static void shuffleArray(Integer[] array)
@@ -163,41 +203,38 @@ public class GeneticAlgorithm {
         }
     }
     //step 3-1: calculate fitness of the chromosomes
-    public static void calculateFitness(int[][] chromosomeArray) {
+    public static int[][] getNextGeneration(int[][] chromosomeArray) {
+        int[] fitness = getFitness(chromosomeArray);
+        int[][] nextGeneration = randomSelectChromosome(fitness, chromosomeNum, chromosomeArray);
+        return nextGeneration;
+    }
+    //get fitness
+    public static int[] getFitness(int[][] array) {
         int[] fitness  = new int[chromosomeNum*2];
         int distance;
         int backtowarehouse;
-        for(int i = 0; i < chromosomeArray.length; i++) {
-            for(int j = 0; j < chromosomeArray[0].length; j++) {
-                int pointx = chromosomeArray[i][j] % 30;
-                int pointy = chromosomeArray[i][j] / 30;
+        for(int i = 0; i < array.length; i++) {
+            for(int j = 0; j < array[0].length; j++) {
+                int pointx = array[i][j] % 30;
+                int pointy = array[i][j] / 30;
                 if(j==0) {
                     distance = (int)Math.sqrt(Math.pow((pointx - 5),2) + Math.pow((pointy - 5),2));
                 } else {
-                    int pointxPre = chromosomeArray[i][j-1] % 30;
-                    int pointyPre = chromosomeArray[i][j-1] / 30;
+                    int pointxPre = array[i][j-1] % 30;
+                    int pointyPre = array[i][j-1] / 30;
                     distance = (int)Math.sqrt(Math.pow((pointx - pointxPre),2) + Math.pow((pointy - pointyPre),2));
                 }
                 fitness[i] = fitness[i] + distance;
             }
-            int pointxEnd = chromosomeArray[i][chromosomeArray[0].length-1] % 30;
-            int pointyEnd = chromosomeArray[i][chromosomeArray[0].length-1] / 30;
+            int pointxEnd = array[i][array[0].length-1] % 30;
+            int pointyEnd = array[i][array[0].length-1] / 30;
             backtowarehouse = (int)Math.sqrt(Math.pow((pointxEnd - 5),2) + Math.pow((pointyEnd - 5),2));
             fitness[i] = 1000000/(fitness[i] + backtowarehouse);
-            // initial fitness
-            System.out.print(fitness[i] + " ");
         }
-        System.out.println();
-        System.out.println("selected fitness number: ");
-        randomSelectChromosome(fitness, chromosomeNum, chromosomeArray);
-
-        /*for(int i = 0; i<chromosomeNum; i++) {
-            System.out.print(arrNum[i] + " ");
-        }*/
-
+        return fitness;
     }
-    //step 3-2: base on probability, randomly select # chromosomes
-    public static void randomSelectChromosome(int[] fitnessArray, int selectNum, int[][] previousGeneration) {
+    //step 3-2: base on probability, randomly select # chromosomes, generatte next generation
+    public static int[][] randomSelectChromosome(int[] fitnessArray, int selectNum, int[][] previousGeneration) {
         int total = 0;
         int[] totalArray = new int[fitnessArray.length+1];
         int[][] nextGeneration = new int[selectNum][30];
@@ -207,11 +244,6 @@ public class GeneticAlgorithm {
             total = total + fitnessArray[i];
             totalArray[i+1] = total;
         }
-        for(int j = 0; j < totalArray.length; j++) {
-            System.out.print(totalArray[j] + " ");
-        }
-        System.out.println();
-
         for(int i = 0; i < selectNum;) {
             int select = (int)(Math.random() * total);
             for(int j = 1; j < totalArray.length; j++) {
@@ -222,26 +254,13 @@ public class GeneticAlgorithm {
             }
         }
         Integer[] arr = set.toArray(new Integer[set.size()]);
-        for(int i=0; i<selectNum; i++) {
-            System.out.print(arr[i]+" ");
-        }
-        System.out.println();
-        for(int i = 0; i < selectNum; i++) {
-            //int num = arr[i];
-            //selectedArray[i] = num;
-            System.out.println(arr[i] + ": " +totalArray[arr[i]]+" "+ fitnessArray[arr[i]]);
-        }
         //Generate next generation
-        System.out.println("Next generation is: ");
         for(int i = 0; i < arr.length; i++) {
             for(int j = 0; j < 30; j++) {
                 nextGeneration[i][j] = previousGeneration[arr[i]][j];
-                System.out.print(nextGeneration[i][j] + " ");
             }
-            System.out.println();
         }
-
-        //return selectedArray;
+        return nextGeneration;
     }
 
     //random select #
