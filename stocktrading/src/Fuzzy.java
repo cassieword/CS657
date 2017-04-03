@@ -9,7 +9,7 @@ public class Fuzzy {
         float stock = 0;
         float totalMoney = 10000;
         float r = randomWithRange(-1, 1);
-        for(int i = 1; i < 151; i++) {
+        for(int i = 1; i <= 150; i++) {
             price = getPrice(i,r);
             mad = getMAD(i,r);
             float priceArray[] = fuzzyPrice(price);
@@ -26,9 +26,10 @@ public class Fuzzy {
             }
             totalMoney = totalMoney - cog;
             stock = stock + cog / price;
-            System.out.println("For the " + i +"th day, the money you have is " + totalMoney + ", the stocks you have is "+ stock);
+            System.out.println(i +" || Money: " + totalMoney + " || Stocks: " + stock + " || COG: " + cog + " || Price: " + price);
+            //System.out.println(cog / price + " " + cog + " " + (totalMoney + stock * price) + " ");
         }
-        System.out.println("the money you have is " + (totalMoney + stock * price));
+        System.out.println("Maximum Money: " + (totalMoney + stock * price));
 
     }
     private static float getPrice(int i, float r) {
