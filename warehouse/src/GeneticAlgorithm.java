@@ -109,7 +109,7 @@ public class GeneticAlgorithm {
         while(n < chromosomeNum*2) {
             double cProbability = Math.random();
             //System.out.println(cProbability);
-            if (cProbability > 0.05) {
+            if (cProbability > 0.2) {
                 //array used to crossover
                 //selectNumber = randomSelect(2, chromosomeNum);
                 int[] fitness = getFitness(array);
@@ -290,25 +290,9 @@ public class GeneticAlgorithm {
         if(flag == 0) {
             //System.out.println(loop+" average: " + average + " best: " + best);
             System.out.println(average + " " + best);
-        } else {
-            System.out.println();
-            System.out.println("average: " + average + " best: " + best + " position: "+ position);
-            System.out.println();
-            System.out.println("--- chosen chromosome ---");
-            for(int i = 0; i < chosenChromosome.length; i++) {
-                chosenChromosome[i] = array[position][i];
-                System.out.print(chosenChromosome[i]+ " ");
-            }
-            System.out.println();
-            System.out.println();
-            System.out.println("--- deliver sequence ---");
-            for(int i = 0; i < chosenChromosome.length; i++) {
-                chosenChromosome[i] = array[position][i];
-                int x = chosenChromosome[i] % 30;
-                int y = chosenChromosome[i] / 30;
-                System.out.print("("+x+" "+y+"),");
-            }
-            System.out.println();
+        }
+        for(int i = 0; i < chosenChromosome.length; i++) {
+            chosenChromosome[i] = array[position][i];
         }
         if(best < bestResult) {
             bestResult = best;
