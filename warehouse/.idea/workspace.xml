@@ -29,19 +29,22 @@
       <file leaf-file-name="GeneticAlgorithm.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/GeneticAlgorithm.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="12">
-              <caret line="43" column="9" lean-forward="true" selection-start-line="43" selection-start-column="9" selection-end-line="43" selection-end-column="9" />
+            <state relative-caret-position="38">
+              <caret line="111" column="35" lean-forward="false" selection-start-line="111" selection-start-column="35" selection-end-line="111" selection-end-column="35" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="method#main#0;class#GeneticAlgorithm#0" expanded="false" />
+                <element signature="method#initHouse#0;class#GeneticAlgorithm#0" expanded="false" />
+                <element signature="method#generateChromosomes#0;class#GeneticAlgorithm#0" expanded="false" />
                 <element signature="method#crossoverMethod#0;class#GeneticAlgorithm#0" expanded="false" />
+                <element signature="e#7762#7771#0" expanded="true" />
                 <element signature="method#getNextGeneration#0;class#GeneticAlgorithm#0" expanded="false" />
                 <element signature="method#getFitness#0;class#GeneticAlgorithm#0" expanded="false" />
                 <element signature="method#randomSelectChromosome#0;class#GeneticAlgorithm#0" expanded="false" />
+                <element signature="method#getAverage#0;class#GeneticAlgorithm#0" expanded="false" />
                 <element signature="method#getDistance#0;class#GeneticAlgorithm#0" expanded="false" />
                 <element signature="method#printDelivery#0;class#GeneticAlgorithm#0" expanded="false" />
                 <element signature="method#randomSelect#0;class#GeneticAlgorithm#0" expanded="false" />
-                <marker date="1491350404000" expanded="false" signature="3485:3768" ph="{...}" />
-                <marker date="1491350404000" expanded="false" signature="3981:6651" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -82,6 +85,8 @@
     <findStrings>
       <find>System.out.println()</find>
       <find>best</find>
+      <find>selectNumber</find>
+      <find>set</find>
     </findStrings>
   </component>
   <component name="GradleLocalSettings">
@@ -98,9 +103,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="827" />
+    <option name="x" value="1229" />
     <option name="y" value="23" />
-    <option name="width" value="1661" />
+    <option name="width" value="1259" />
     <option name="height" value="1343" />
   </component>
   <component name="ProjectView">
@@ -156,7 +161,7 @@
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Artifacts" />
-    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
   </component>
   <component name="RunManager" selected="Application.GeneticAlgorithm">
@@ -443,8 +448,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="827" y="23" width="1661" height="1343" extended-state="0" />
-    <editor active="true" />
+    <frame x="1229" y="23" width="1259" height="1343" extended-state="0" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -455,13 +460,13 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.5991837" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.75265306" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32979593" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25350142" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4648526" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -554,15 +559,18 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#main#0;class#GeneticAlgorithm#0" expanded="false" />
+            <element signature="method#initHouse#0;class#GeneticAlgorithm#0" expanded="false" />
+            <element signature="method#generateChromosomes#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#crossoverMethod#0;class#GeneticAlgorithm#0" expanded="false" />
+            <element signature="e#7762#7771#0" expanded="true" />
             <element signature="method#getNextGeneration#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#getFitness#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#randomSelectChromosome#0;class#GeneticAlgorithm#0" expanded="false" />
+            <element signature="method#getAverage#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#getDistance#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#printDelivery#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#randomSelect#0;class#GeneticAlgorithm#0" expanded="false" />
-            <marker date="1491350404000" expanded="false" signature="3485:3768" ph="{...}" />
-            <marker date="1491350404000" expanded="false" signature="3981:6651" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -593,15 +601,18 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#main#0;class#GeneticAlgorithm#0" expanded="false" />
+            <element signature="method#initHouse#0;class#GeneticAlgorithm#0" expanded="false" />
+            <element signature="method#generateChromosomes#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#crossoverMethod#0;class#GeneticAlgorithm#0" expanded="false" />
+            <element signature="e#7762#7771#0" expanded="true" />
             <element signature="method#getNextGeneration#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#getFitness#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#randomSelectChromosome#0;class#GeneticAlgorithm#0" expanded="false" />
+            <element signature="method#getAverage#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#getDistance#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#printDelivery#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#randomSelect#0;class#GeneticAlgorithm#0" expanded="false" />
-            <marker date="1491350404000" expanded="false" signature="3485:3768" ph="{...}" />
-            <marker date="1491350404000" expanded="false" signature="3981:6651" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -629,19 +640,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/GeneticAlgorithm.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="12">
-          <caret line="43" column="9" lean-forward="true" selection-start-line="43" selection-start-column="9" selection-end-line="43" selection-end-column="9" />
+        <state relative-caret-position="38">
+          <caret line="111" column="35" lean-forward="false" selection-start-line="111" selection-start-column="35" selection-end-line="111" selection-end-column="35" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="method#main#0;class#GeneticAlgorithm#0" expanded="false" />
+            <element signature="method#initHouse#0;class#GeneticAlgorithm#0" expanded="false" />
+            <element signature="method#generateChromosomes#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#crossoverMethod#0;class#GeneticAlgorithm#0" expanded="false" />
+            <element signature="e#7762#7771#0" expanded="true" />
             <element signature="method#getNextGeneration#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#getFitness#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#randomSelectChromosome#0;class#GeneticAlgorithm#0" expanded="false" />
+            <element signature="method#getAverage#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#getDistance#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#printDelivery#0;class#GeneticAlgorithm#0" expanded="false" />
             <element signature="method#randomSelect#0;class#GeneticAlgorithm#0" expanded="false" />
-            <marker date="1491350404000" expanded="false" signature="3485:3768" ph="{...}" />
-            <marker date="1491350404000" expanded="false" signature="3981:6651" ph="{...}" />
           </folding>
         </state>
       </provider>
