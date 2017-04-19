@@ -1,286 +1,204 @@
+import java.util.ArrayList;
+import java.util.Collections;
+
 /**
  * Created by xinyu on 4/19/17.
  */
 public class NeuralNetwork {
     public static int inputNum = 2;
-    public static int hiddenNum = 5;
+    public static int hiddenNum = 6;
     public static int outputNum = 2;
-    public static double rate = 0.2;
+    public static double rate = 2;
+    public static int epoch = 0;
 
+    public static double[] input = new double[inputNum];
     public static double[][] inputWeight = new double[hiddenNum][inputNum];
     public static double[] hiddenThreshold = new double[hiddenNum];
     public static double[][] hiddenWeight = new double[outputNum][hiddenNum];
     public static double[] outputThreshold = new double[outputNum];
+    public static double[] hiddenOutput = new double[hiddenNum];
+    public static double[] output = new double[outputNum];
+    public static double err = 10;
+    public static int testErrors = 0;
+    public static double[][] testSet = new double[100][2];
+
 
     public static void main(String[] args) {
         System.out.println("Neural Network");
         System.out.println();
-        for(int i = 0; i < 4000; i++) {
-            neuralNetwork(0,0, 0,0);
-            neuralNetwork(0,1, 1,0);
-            neuralNetwork(1,0, 1,0);
-            neuralNetwork(1,1, 0,1);
+        //initial first weight, threshold, input num 2, output num 5
+        initial();
+        while(err > 0.001) {
+            err = 0;
+            training(0,0, 0,0);
+            training(0,1, 1,0);
+            training(1,0, 1,0);
+            training(1,1, 0,1);
+            System.out.println(err + " ");
+            epoch++;
         }
+        System.out.println("Epoch");
+        System.out.println(epoch);
+        initialTest();
+        for(int i = 0; i < testSet.length; i++) {
+            testErrors += testing(testSet[i][0] , testSet[i][1]);
+        }
+        System.out.println("Errors");
+        System.out.println(testErrors);
 
+    }
 
+    public static void initial() {
+        for(int i = 0; i < inputWeight.length; i++) {
+            for(int j = 0; j < inputWeight[0].length; j++) {
+                inputWeight[i][j] = randomWeight(inputNum);
+            }
+        }
+        for(int i = 0; i < hiddenThreshold.length; i++) {
+            hiddenThreshold[i] = randomThreshold(inputNum);
+        }
+        //initial second weight, threshold, input num 5, output num 2
+        for(int i = 0; i < hiddenWeight.length; i++) {
+            for(int j = 0; j < hiddenWeight[0].length; j++) {
+                hiddenWeight[i][j] = randomWeight(hiddenNum);
+            }
+        }
+        for(int i = 0; i < outputThreshold.length; i++) {
+            outputThreshold[i] = randomThreshold(hiddenNum);
+        }
+    }
 
+    public static void initialTest() {
+        ArrayList<Integer> value = new ArrayList<Integer>();
+        value.add(0);
+        value.add(1);
+        for (int i = 0; i < testSet.length; i++) {
+            for(int j = 0; j < testSet[0].length; j++) {
+                Collections.shuffle(value);
+                testSet[i][j] = value.get(0) + randomNoise();
+            }
+        }
+    }
 
+    public static int testing(double x1, double x2) {
+
+        int error = 0;
+        input[0] = x1;
+        input[1] = x2;
+
+        hiddenOutput = sigmoidActivation(input, inputWeight, hiddenThreshold, hiddenNum);
+        //calculate activate for output
+        output = sigmoidActivation(hiddenOutput, hiddenWeight, outputThreshold, outputNum);
+
+        if(x1 > 0.8 && x2 > 0.8) {
+            if(output[0] > 0.5 && output[1] > 0.5) {
+                error = 0;
+            }
+            else {
+                error = 1;
+            }
+        }
+        else if(x1 < 0.8 && x2 > 0.8) {
+            if(output[0] > 0.5 && output[1] < 0.5) {
+                error = 0;
+            }
+            else {
+                error = 1;
+            }
+        }
+        else if(x1 > 0.8 && x2 < 0.8) {
+            if(output[0] > 0.5 && output[1] < 0.5) {
+                error = 0;
+            }
+            else {
+                error = 1;
+            }
+        }
+        else {
+            if(output[0] < 0.5 && output[1] < 0.5) {
+                error = 0;
+            }
+            else {
+                error = 1;
+            }
+        }
+        return error;
     }
 
     public static void neuralNetwork(int x1, int x2, int y1, int y2) {
-        //epoch 1-1 x1 = 0, x2 = 0, desired output sum = 0, carry = 0
-        System.out.println("========Input x1=0, x2=0:");
-        double[] input = new double[inputNum];
         input[0] = x1 + randomNoise();
         input[1] = x2 + randomNoise();
-        System.out.println(input[0] + ", " + input[1]);
-        //initial first weight, threshold, input num 2, output num 5
-
-        double[][] inputWeightNew = new double[hiddenNum][inputNum];
-        double[] hiddenThresholdNew = new double[hiddenNum];
-        double[][] hiddenWeightNew = new double[outputNum][hiddenNum];
-        double[] outputThresholdNew = new double[outputNum];
-
-        System.out.println("========Input weight");
-        for(int i = 0; i < inputWeight.length; i++) {
-            for(int j = 0; j < inputWeight[0].length; j++) {
-                inputWeight[i][j] = randomWeight(inputNum);
-                inputWeightNew[i][j] = randomWeight(inputNum);
-                System.out.print(inputWeight[i][j] + " ");
-            }
-            System.out.println();
-        }
-        System.out.println("========Hidden threshold");
-        for(int i = 0; i < hiddenThreshold.length; i++) {
-            hiddenThreshold[i] = randomThreshold(inputNum);
-            hiddenThresholdNew[i] = randomThreshold(inputNum);
-            System.out.print(hiddenThreshold[i] + " ");
-        }
-        System.out.println();
         //calculate activate for hidden output
-        double[] hiddenOutput = sigmoidActivation(input, inputWeight, hiddenThreshold, hiddenNum);
-        System.out.println("========Hidden output");
-        for(int i = 0; i < hiddenOutput.length; i++) {
-            System.out.println(hiddenOutput[i]+" ");
-        }
-        //initial second weight, threshold, input num 5, output num 2
-
-        System.out.println("========Hidden weight");
-        for(int i = 0; i < hiddenWeight.length; i++) {
-            for(int j = 0; j < hiddenWeight[0].length; j++) {
-                hiddenWeight[i][j] = randomWeight(hiddenNum);
-                hiddenWeightNew[i][j] = randomWeight(hiddenNum);
-                System.out.print(hiddenWeight[i][j] + " ");
-            }
-            System.out.println();
-        }
-        System.out.println("========Output threshold");
-        for(int i = 0; i < outputThreshold.length; i++) {
-            outputThreshold[i] = randomThreshold(hiddenNum);
-            outputThresholdNew[i] = randomThreshold(hiddenNum);
-            System.out.print(outputThreshold[i] + " ");
-        }
-        System.out.println();
+        hiddenOutput = sigmoidActivation(input, inputWeight, hiddenThreshold, hiddenNum);
         //calculate activate for output
-        double[] output = sigmoidActivation(hiddenOutput, hiddenWeight, outputThreshold, outputNum);
-        System.out.println("========Final output");
-        for(int i = 0; i < output.length; i++) {
-            System.out.println(output[i]+" ");
-        }
-        //weight training for hidden layer
-        System.out.println("========Hidden layer weight training");
-        double[] outputErrGradient = new double[outputNum];
-
-        for(int i = 0; i < hiddenOutput.length; i++) {
-            outputErrGradient[0] = output[0] * (1-output[0]) * (y1 - output[0]);
-            outputErrGradient[1] = output[1] * (1-output[1]) * (y2 - output[1]);
-            hiddenWeightNew[0][i] = hiddenWeight[0][i] + rate * hiddenOutput[i] * outputErrGradient[0];
-            hiddenWeightNew[1][i] = hiddenWeight[1][i] + rate * hiddenOutput[i] * outputErrGradient[1];
-            outputThresholdNew[0] = outputThreshold[0] + rate * outputThreshold[0] * outputErrGradient[0];
-            outputThresholdNew[1] = outputThreshold[1] + rate * outputThreshold[1] * outputErrGradient[1];
-
-        }
-        for(int i = 0; i < hiddenWeightNew.length; i++) {
-            for(int j = 0; j < hiddenWeightNew[0].length; j++) {
-                System.out.print(hiddenWeightNew[i][j] + " ");
-            }
-            System.out.println();
-        }
-        System.out.println("========Output layer threshold training");
-        for(int i = 0; i < outputThresholdNew.length; i++) {
-            System.out.print(outputThresholdNew[i] + " ");
-        }
-        System.out.println();
-        System.out.println("========Input layer weight training");
-        double[] hiddenErrGradient = new double[hiddenNum];
-        double[] sumGradient  = new double[hiddenNum];
-        for(int i = 0; i < sumGradient.length; i++) {
-            sumGradient[i] = 0;
-        }
-        System.out.println("========Hidden error gradient");
-        for(int i = 0; i < hiddenOutput.length; i++) {
-            for(int j = 0; j < outputErrGradient.length; j++) {
-                sumGradient[i] += outputErrGradient[j] * hiddenWeight[j][i] ;
-            }
-            hiddenErrGradient[i] = hiddenOutput[i] * (1 - hiddenOutput[i]) * sumGradient[i];
-        }
-        for(int i = 0; i < inputWeight.length; i++) {
-            for(int j = 0; j < inputWeight[0].length; j++) {
-                inputWeightNew[i][j] = inputWeight[i][j] + rate * input[j] * hiddenErrGradient[i];
-                System.out.print(inputWeightNew[i][j] + " ");
-
-            }
-            System.out.println();
-        }
-        System.out.println("========Hidden layer threshold training");
-        for(int i = 0; i < hiddenThresholdNew.length; i++) {
-            hiddenThresholdNew[i] = hiddenThreshold[i] + rate * hiddenThreshold[i] * hiddenErrGradient[i];
-            System.out.print(hiddenThresholdNew[i] + " ");
-
-        }
-        hiddenWeight = hiddenWeightNew;
-        outputThreshold = outputThresholdNew;
-        inputWeight = inputWeightNew;
-        hiddenThreshold = hiddenThresholdNew;
-
+        output = sigmoidActivation(hiddenOutput, hiddenWeight, outputThreshold, outputNum);
+        err += Math.pow(output[0] - y1,2) + Math.pow(output[1] - y2,2);
     }
 
     public static void training(int x1, int x2, int y1, int y2) {
-        //epoch 1-1 x1 = 0, x2 = 0, desired output sum = 0, carry = 0
-        System.out.println("========Input x1=0, x2=0:");
-        double[] input = new double[inputNum];
-        input[0] = x1 + randomNoise();
-        input[1] = x2 + randomNoise();
-        System.out.println(input[0] + ", " + input[1]);
-        //initial first weight, threshold, input num 2, output num 5
-
+        neuralNetwork(x1, x2, y1, y2);
         double[][] inputWeightNew = new double[hiddenNum][inputNum];
         double[] hiddenThresholdNew = new double[hiddenNum];
         double[][] hiddenWeightNew = new double[outputNum][hiddenNum];
         double[] outputThresholdNew = new double[outputNum];
 
-        System.out.println("========Input weight");
-        for(int i = 0; i < inputWeight.length; i++) {
-            for(int j = 0; j < inputWeight[0].length; j++) {
-                inputWeight[i][j] = randomWeight(inputNum);
-                inputWeightNew[i][j] = randomWeight(inputNum);
-                System.out.print(inputWeight[i][j] + " ");
-            }
-            System.out.println();
-        }
-        System.out.println("========Hidden threshold");
-        for(int i = 0; i < hiddenThreshold.length; i++) {
-            hiddenThreshold[i] = randomThreshold(inputNum);
-            hiddenThresholdNew[i] = randomThreshold(inputNum);
-            System.out.print(hiddenThreshold[i] + " ");
-        }
-        System.out.println();
-        //calculate activate for hidden output
-        double[] hiddenOutput = sigmoidActivation(input, inputWeight, hiddenThreshold, hiddenNum);
-        System.out.println("========Hidden output");
-        for(int i = 0; i < hiddenOutput.length; i++) {
-            System.out.println(hiddenOutput[i]+" ");
-        }
-        //initial second weight, threshold, input num 5, output num 2
-
-        System.out.println("========Hidden weight");
-        for(int i = 0; i < hiddenWeight.length; i++) {
-            for(int j = 0; j < hiddenWeight[0].length; j++) {
-                hiddenWeight[i][j] = randomWeight(hiddenNum);
-                hiddenWeightNew[i][j] = randomWeight(hiddenNum);
-                System.out.print(hiddenWeight[i][j] + " ");
-            }
-            System.out.println();
-        }
-        System.out.println("========Output threshold");
-        for(int i = 0; i < outputThreshold.length; i++) {
-            outputThreshold[i] = randomThreshold(hiddenNum);
-            outputThresholdNew[i] = randomThreshold(hiddenNum);
-            System.out.print(outputThreshold[i] + " ");
-        }
-        System.out.println();
-        //calculate activate for output
-        double[] output = sigmoidActivation(hiddenOutput, hiddenWeight, outputThreshold, outputNum);
-        System.out.println("========Final output");
-        for(int i = 0; i < output.length; i++) {
-            System.out.println(output[i]+" ");
-        }
         //weight training for hidden layer
-        System.out.println("========Hidden layer weight training");
         double[] outputErrGradient = new double[outputNum];
 
+
+        outputErrGradient[0] = output[0] * (1-output[0]) * (y1 - output[0]);
+        outputErrGradient[1] = output[1] * (1-output[1]) * (y2 - output[1]);
+
         for(int i = 0; i < hiddenOutput.length; i++) {
-            outputErrGradient[0] = output[0] * (1-output[0]) * (y1 - output[0]);
-            outputErrGradient[1] = output[1] * (1-output[1]) * (y2 - output[1]);
             hiddenWeightNew[0][i] = hiddenWeight[0][i] + rate * hiddenOutput[i] * outputErrGradient[0];
             hiddenWeightNew[1][i] = hiddenWeight[1][i] + rate * hiddenOutput[i] * outputErrGradient[1];
-            outputThresholdNew[0] = outputThreshold[0] + rate * outputThreshold[0] * outputErrGradient[0];
-            outputThresholdNew[1] = outputThreshold[1] + rate * outputThreshold[1] * outputErrGradient[1];
+        }
 
-        }
-        for(int i = 0; i < hiddenWeightNew.length; i++) {
-            for(int j = 0; j < hiddenWeightNew[0].length; j++) {
-                System.out.print(hiddenWeightNew[i][j] + " ");
-            }
-            System.out.println();
-        }
-        System.out.println("========Output layer threshold training");
-        for(int i = 0; i < outputThresholdNew.length; i++) {
-            System.out.print(outputThresholdNew[i] + " ");
-        }
-        System.out.println();
-        System.out.println("========Input layer weight training");
+        //outputThresholdNew[0] = outputThreshold[0] + rate * outputThreshold[0] * outputErrGradient[0];
+        //outputThresholdNew[1] = outputThreshold[1] + rate * outputThreshold[1] * outputErrGradient[1];
+
         double[] hiddenErrGradient = new double[hiddenNum];
         double[] sumGradient  = new double[hiddenNum];
         for(int i = 0; i < sumGradient.length; i++) {
             sumGradient[i] = 0;
         }
-        System.out.println("========Hidden error gradient");
+
         for(int i = 0; i < hiddenOutput.length; i++) {
             for(int j = 0; j < outputErrGradient.length; j++) {
-                sumGradient[i] += outputErrGradient[j] * hiddenWeight[j][i] ;
+                sumGradient[i] += outputErrGradient[j] * hiddenWeight[j][i];
             }
             hiddenErrGradient[i] = hiddenOutput[i] * (1 - hiddenOutput[i]) * sumGradient[i];
         }
+
         for(int i = 0; i < inputWeight.length; i++) {
             for(int j = 0; j < inputWeight[0].length; j++) {
                 inputWeightNew[i][j] = inputWeight[i][j] + rate * input[j] * hiddenErrGradient[i];
-                System.out.print(inputWeightNew[i][j] + " ");
-
             }
-            System.out.println();
         }
-        System.out.println("========Hidden layer threshold training");
         for(int i = 0; i < hiddenThresholdNew.length; i++) {
-            hiddenThresholdNew[i] = hiddenThreshold[i] + rate * hiddenThreshold[i] * hiddenErrGradient[i];
-            System.out.print(hiddenThresholdNew[i] + " ");
-
+            //hiddenThresholdNew[i] = hiddenThreshold[i] + rate * hiddenThreshold[i] * hiddenErrGradient[i];
         }
         hiddenWeight = hiddenWeightNew;
-        outputThreshold = outputThresholdNew;
+        //outputThreshold = outputThresholdNew;
         inputWeight = inputWeightNew;
-        hiddenThreshold = hiddenThresholdNew;
-
+        //hiddenThreshold = hiddenThresholdNew;
     }
 
     //sigmoid activation method, num is # of output
-    public static double[] sigmoidActivation(double[] input, double[][] weight, double[] threshold, int num) {
-        double[] output = new double[num];
-        for(int i = 0; i < output.length; i++) {
-            output[i] = 0;
+    public static double[] sigmoidActivation(double[] inputTemp, double[][] weight, double[] threshold, int num) {
+        double[] outputTemp = new double[num];
+        for(int i = 0; i < outputTemp.length; i++) {
+            outputTemp[i] = 0;
         }
-        for(int i = 0; i < output.length; i++) {
-            for(int j = 0; j < input.length; j++) {
-                System.out.println("input " + input[j] + " weight "+ weight[i][j]);
-                output[i] += input[j]*weight[i][j];
+        for(int i = 0; i < outputTemp.length; i++) {
+            for(int j = 0; j < inputTemp.length; j++) {
+                outputTemp[i] += inputTemp[j] * weight[i][j];
             }
-            System.out.println("sum " + output[i] + " threshold " + threshold[i]);
-            output[i] = output[i] - threshold[i];
+            outputTemp[i] = outputTemp[i] - threshold[i];
             //sigmoid
-            output[i] = 1 / (1 + Math.pow(Math.E,(-1 * output[i])));
-            System.out.println("hidden output "+ output[i]);
+            outputTemp[i] = 1 / (1 + Math.exp(-1 * outputTemp[i]));
         }
-        return output;
+        return outputTemp;
     }
     // random noise range [-0.2, +0.2]
     public static double randomNoise() {
@@ -296,5 +214,4 @@ public class NeuralNetwork {
         double range = (2.4 + 2.4) / num;
         return (Math.random() * range) - (2.4 / num);
     }
-
 }
