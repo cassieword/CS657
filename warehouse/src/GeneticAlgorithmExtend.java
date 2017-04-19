@@ -117,7 +117,7 @@ public class GeneticAlgorithmExtend {
         while(n < chromosomeNum*2) {
             double cProbability = Math.random();
             //System.out.println(cProbability);
-            if (cProbability > 0.8) {
+            if (cProbability > 0.97) {
                 //array used to crossover
                 //selectNumber = randomSelect(2, chromosomeNum);
                 int[] fitness = getFitness(array);

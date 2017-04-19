@@ -44,7 +44,8 @@ public class GeneticAlgorithm {
         System.out.println("bestResult: "+ bestResult);
         // Print Delivery Order
         System.out.println("--- print ---");
-        printDelivery(map, bestChromosome);
+        print(bestChromosome);
+        //printDelivery(map, bestChromosome);
     }
     //step 1: Generate Let n=30 random home locations in the above rectangular area.
     public static void initHouse(String map[][]) {
@@ -74,7 +75,9 @@ public class GeneticAlgorithm {
             shuffleArray(arr);
             for(int j = 0; j < arr.length; j++){
                 chromosomeArray[i][j] = arr[j];
-                System.out.print(chromosomeArray[i][j] + " ");
+                int x = chromosomeArray[i][j] % 30;
+                int y = chromosomeArray[i][j] / 30;
+                System.out.print("(" + x + " " + y + ")");
             }
             System.out.println();
         }
@@ -109,7 +112,7 @@ public class GeneticAlgorithm {
         while(n < chromosomeNum*2) {
             double cProbability = Math.random();
             //System.out.println(cProbability);
-            if (cProbability > 0.2) {
+            if (cProbability > 0.03) {
                 //array used to crossover
                 //selectNumber = randomSelect(2, chromosomeNum);
                 int[] fitness = getFitness(array);
@@ -370,6 +373,13 @@ public class GeneticAlgorithm {
             currentPosition++;
             c.flush();
             c.readLine();
+        }
+    }
+    public static void print(int[] chromosome) {
+        for(int i = 0; i < chromosome.length; i++) {
+            int x = chromosome[i] % 30;
+            int y = chromosome[i] / 30;
+            System.out.print("(" + x + " " + y + ")");
         }
     }
     //random select #
