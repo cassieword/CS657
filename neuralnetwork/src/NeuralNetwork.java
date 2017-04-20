@@ -1,14 +1,15 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by xinyu on 4/19/17.
  */
 public class NeuralNetwork {
     public static int inputNum = 2;
-    public static int hiddenNum = 6;
+    public static int hiddenNum = 5;
     public static int outputNum = 2;
-    public static double rate = 2;
+    public static double rate = 0.8;
     public static int epoch = 0;
 
     public static double[] input = new double[inputNum];
@@ -19,13 +20,12 @@ public class NeuralNetwork {
     public static double[] hiddenOutput = new double[hiddenNum];
     public static double[] output = new double[outputNum];
     public static double err = 10;
+    public static List<Double> errList = new ArrayList<Double>();
     public static int testErrors = 0;
     public static double[][] testSet = new double[100][2];
 
 
     public static void main(String[] args) {
-        System.out.println("Neural Network");
-        System.out.println();
         //initial first weight, threshold, input num 2, output num 5
         initial();
         while(err > 0.001) {
@@ -34,17 +34,19 @@ public class NeuralNetwork {
             training(0,1, 1,0);
             training(1,0, 1,0);
             training(1,1, 0,1);
-            System.out.println(err + " ");
+            errList.add(err);
             epoch++;
         }
-        System.out.println("Epoch");
-        System.out.println(epoch);
+        System.out.println("=========Neural Network Training");
+        System.out.println("LearningRate " + rate);
+        System.out.println("IterationTimes " + epoch);
+        System.out.println("MeanError " + getMeanErr(errList));
         initialTest();
         for(int i = 0; i < testSet.length; i++) {
             testErrors += testing(testSet[i][0] , testSet[i][1]);
         }
-        System.out.println("Errors");
-        System.out.println(testErrors);
+        System.out.println("=========Neural Network Testing");
+        System.out.println("Errors " + testErrors);
 
     }
 
@@ -91,7 +93,7 @@ public class NeuralNetwork {
         output = sigmoidActivation(hiddenOutput, hiddenWeight, outputThreshold, outputNum);
 
         if(x1 > 0.8 && x2 > 0.8) {
-            if(output[0] > 0.5 && output[1] > 0.5) {
+            if(output[0] < 0.5 && output[1] > 0.5) {
                 error = 0;
             }
             else {
@@ -123,6 +125,22 @@ public class NeuralNetwork {
             }
         }
         return error;
+    }
+
+    public static double getMeanErr(List<Double> list) {
+        double totalErr = 0;
+        double averageErr = 0;
+        double meanErr = 0;
+        double sum = 0;
+        for(int i = 0; i < list.size(); i++) {
+            totalErr += list.get(i);
+        }
+        averageErr = totalErr / list.size();
+        for(int i = 0; i < list.size(); i++) {
+            sum += Math.pow(list.get(i) - averageErr, 2);
+        }
+        meanErr = sum / list.size();
+        return meanErr;
     }
 
     public static void neuralNetwork(int x1, int x2, int y1, int y2) {
